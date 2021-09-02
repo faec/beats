@@ -88,10 +88,10 @@ require (
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
-	github.com/golang/snappy v0.0.1
+	github.com/golang/snappy v0.0.3
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
-	github.com/google/go-cmp v0.5.2
+	github.com/google/go-cmp v0.5.4
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.1.2-0.20190416172445-c2e93f3ae59f
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
@@ -136,7 +136,7 @@ require (
 	github.com/prometheus/common v0.7.0
 	github.com/prometheus/procfs v0.0.11
 	github.com/prometheus/prometheus v2.5.0+incompatible
-	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
+	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/reviewdog/reviewdog v0.9.17
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
@@ -147,13 +147,13 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/objx v0.2.0 // indirect
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20200626092518-2ab8e397a786
 	github.com/ugorji/go/codec v1.1.8
 	github.com/urso/sderr v0.0.0-20200210124243-c2a16f3d43ec
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
-	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
+	github.com/xdg/scram v1.0.3
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
 	go.elastic.co/apm v1.8.1-0.20200909061013-2aef45b9cf4b
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
@@ -164,13 +164,13 @@ require (
 	go.uber.org/atomic v1.5.0
 	go.uber.org/multierr v1.3.0
 	go.uber.org/zap v1.14.0
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	golang.org/x/lint v0.0.0-20200130185559-910be7a94367
-	golang.org/x/net v0.0.0-20200904194848-62affa334b73
+	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
-	golang.org/x/sys v0.0.0-20201009025420-dfb3f7c4e634
-	golang.org/x/text v0.3.3
+	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1
+	golang.org/x/text v0.3.6
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20200904185747-39188db58858
 	google.golang.org/api v0.15.0
@@ -178,7 +178,11 @@ require (
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.24.0
 	gopkg.in/inf.v0 v0.9.1
+	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
+	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
+	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
+	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
 	gopkg.in/yaml.v2 v2.3.0
 	gotest.tools v2.2.0+incompatible
@@ -192,7 +196,7 @@ require (
 replace (
 	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.2.0+incompatible
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
-	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20210120173147-5c8cb347d877
+	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20210823122811-11c3ef800752
 	github.com/cucumber/godog => github.com/cucumber/godog v0.8.1
 	github.com/docker/docker => github.com/docker/engine v0.0.0-20191113042239-ea84732a7725
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
