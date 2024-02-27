@@ -7,6 +7,7 @@
 package httpjson
 
 import (
+	"context"
 	"net"
 	"path/filepath"
 
@@ -19,5 +20,9 @@ type npipeDialer struct {
 }
 
 func (d npipeDialer) Dial(_, _ string) (net.Conn, error) {
+	return winio.DialPipe(`\\.\pipe`+filepath.FromSlash(d.path), nil)
+}
+
+func (d npipeDialer) DialContext(_ context.Context, _, _ string) (net.Conn, error) {
 	return winio.DialPipe(`\\.\pipe`+filepath.FromSlash(d.path), nil)
 }

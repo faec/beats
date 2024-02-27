@@ -808,6 +808,10 @@ func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
 	return net.Dial("unix", d.path)
 }
 
+func (d socketDialer) DialContext(_ context.Context, _, _ string) (net.Conn, error) {
+	return net.Dial("unix", d.path)
+}
+
 func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {
 	return func(req *http.Request, via []*http.Request) error {
 		log.Debug("http client: checking redirect")
