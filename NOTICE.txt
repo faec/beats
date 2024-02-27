@@ -12727,11 +12727,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/faec/elastic-agent-libs
-Version: v0.0.0-20240227192509-bd9dfef21de7
+Version: v0.0.0-20240227200753-fdce5d3e81ca
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/faec/elastic-agent-libs@v0.0.0-20240227192509-bd9dfef21de7/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/faec/elastic-agent-libs@v0.0.0-20240227200753-fdce5d3e81ca/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
