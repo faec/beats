@@ -738,8 +738,8 @@ github.com/evanphx/json-patch v4.2.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLi
 github.com/evanphx/json-patch v4.9.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
 github.com/evanphx/json-patch v4.12.0+incompatible h1:4onqiflcdA9EOZ4RxV643DvftH5pOlLGNtQ5lPWQu84=
 github.com/evanphx/json-patch v4.12.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
-github.com/faec/elastic-agent-libs v0.0.0-20240227200753-fdce5d3e81ca h1:sELt9Xx4hIC1RUHEQPBXHFPNbKrzSLpMEC3UX2T2LUA=
-github.com/faec/elastic-agent-libs v0.0.0-20240227200753-fdce5d3e81ca/go.mod h1:pGMj5myawdqu+xE+WKvM5FQzKQ/MonikkWOzoFTJxaU=
+github.com/faec/elastic-agent-libs v0.0.0-20240227211359-f43657bc7869 h1:2jP5hmOyZkFaU2S8fvzoPfyk23QbvMquk1FyeZT4twM=
+github.com/faec/elastic-agent-libs v0.0.0-20240227211359-f43657bc7869/go.mod h1:pGMj5myawdqu+xE+WKvM5FQzKQ/MonikkWOzoFTJxaU=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.9.0/go.mod h1:eQcE1qtQxscV5RaZvpXrrb8Drkc3/DdQ+uUYCNjL+zU=
 github.com/fatih/color v1.10.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=
