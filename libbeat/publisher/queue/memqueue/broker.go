@@ -184,7 +184,7 @@ func newQueue(
 	logger *logp.Logger,
 	ackCallback func(eventCount int),
 	settings Settings,
-	inputQueueSize int,
+	_ int,
 ) *broker {
 	//chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
@@ -213,7 +213,7 @@ func newQueue(
 		buf: make([]queueEntry, settings.Events),
 
 		// broker API channels
-		pushChan:   make(chan pushRequest, inputQueueSize),
+		pushChan:   make(chan pushRequest),
 		getChan:    make(chan getRequest),
 		cancelChan: make(chan producerCancelRequest, 5),
 		metricChan: make(chan metricsRequest),
