@@ -120,7 +120,7 @@ func (c *console) Publish(_ context.Context, batch publisher.Batch) error {
 var nl = []byte("\n")
 
 func (c *console) publishEvent(event *publisher.Event) bool {
-	serializedEvent, err := c.codec.Encode(c.index, &event.Content)
+	serializedEvent, err := c.codec.Encode(c.index, event.Content)
 	if err != nil {
 		if !event.Guaranteed() {
 			return false

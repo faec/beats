@@ -27,7 +27,7 @@ import (
 
 func MakeEvent(fields mapstr.M) publisher.Event {
 	return publisher.Event{
-		Content: beat.Event{
+		Content: &beat.Event{
 			Timestamp: time.Now(),
 			Fields:    fields,
 		},

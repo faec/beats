@@ -60,7 +60,7 @@ func TestToShipperEvent(t *testing.T) {
 		{
 			name: "successfully converts an event without source and data stream",
 			value: publisher.Event{
-				Content: beat.Event{
+				Content: &beat.Event{
 					Timestamp: ts,
 					Meta: mapstr.M{
 						"metafield": 42,
@@ -85,7 +85,7 @@ func TestToShipperEvent(t *testing.T) {
 		{
 			name: "successfully converts an event with source and data stream",
 			value: publisher.Event{
-				Content: beat.Event{
+				Content: &beat.Event{
 					Timestamp: ts,
 					Meta: mapstr.M{
 						"metafield": 42,
@@ -399,7 +399,7 @@ func TestPublish(t *testing.T) {
 		done := false
 		batch := pipeline.NewBatchForTesting(
 			[]publisher.Event{
-				{Content: events[0]}, {Content: events[1]}, {Content: events[2]},
+				{Content: &events[0]}, {Content: &events[1]}, {Content: &events[2]},
 			},
 			func(b publisher.Batch) {
 				// Retry by sending directly back to Publish. In a live
@@ -460,7 +460,7 @@ func TestPublish(t *testing.T) {
 		done := false
 		batch := pipeline.NewBatchForTesting(
 			[]publisher.Event{
-				{Content: events[0]}, {Content: events[1]}, {Content: events[2]},
+				{Content: &events[0]}, {Content: &events[1]}, {Content: &events[2]},
 			},
 			func(b publisher.Batch) {
 				// Retry by sending directly back to Publish. In a live
@@ -496,7 +496,7 @@ func BenchmarkToShipperEvent(b *testing.B) {
 	str := strings.Repeat("somelongstring", 100)
 
 	// This event causes to go through every code path during the event conversion
-	e := publisher.Event{Content: beat.Event{
+	e := publisher.Event{Content: &beat.Event{
 		Timestamp: ts,
 		Meta: mapstr.M{
 			"input_id":  "someinputid",

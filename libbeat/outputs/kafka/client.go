@@ -188,7 +188,7 @@ func (c *client) String() string {
 }
 
 func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
-	event := &data.Content
+	event := data.Content
 	msg := &message{partition: -1, data: *data}
 
 	value, err := data.Cache.GetValue("partition")

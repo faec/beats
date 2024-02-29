@@ -59,7 +59,7 @@ func TestSerialize(t *testing.T) {
 		switch tc.format {
 		case SerializationCBOR:
 			event = publisher.Event{
-				Content: beat.Event{
+				Content: &beat.Event{
 					Fields: mapstr.M{
 						"test_field": tc.value,
 					},

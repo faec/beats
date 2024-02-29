@@ -124,7 +124,7 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	for i := range events {
 		event := &events[i]
 
-		serializedEvent, err := out.codec.Encode(out.beat.Beat, &event.Content)
+		serializedEvent, err := out.codec.Encode(out.beat.Beat, event.Content)
 		if err != nil {
 			if event.Guaranteed() {
 				out.log.Errorf("Failed to serialize the event: %+v", err)

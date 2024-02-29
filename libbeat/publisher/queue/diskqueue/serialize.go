@@ -193,7 +193,7 @@ func (d *eventDecoder) decodeJSONAndCBOR() (publisher.Event, error) {
 
 	return publisher.Event{
 		Flags: publisher.EventFlags(to.Flags),
-		Content: beat.Event{
+		Content: &beat.Event{
 			Timestamp: time.Unix(0, to.Timestamp),
 			Fields:    to.Fields,
 			Meta:      to.Meta,

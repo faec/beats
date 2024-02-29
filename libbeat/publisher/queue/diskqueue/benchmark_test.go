@@ -63,7 +63,7 @@ var (
 // makePublisherEvent creates a sample publisher.Event, using a random message from msgs list
 func makePublisherEvent() publisher.Event {
 	return publisher.Event{
-		Content: beat.Event{
+		Content: &beat.Event{
 			Timestamp: eventTime,
 			Fields: mapstr.M{
 				"message": msgs[rand.Intn(len(msgs))],

@@ -258,7 +258,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		producerCfg.OnDrop = func(event interface{}) {
 			publisherEvent, _ := event.(publisher.Event)
 			if cfg.ClientListener != nil {
-				cfg.ClientListener.DroppedOnPublish(publisherEvent.Content)
+				cfg.ClientListener.DroppedOnPublish(*publisherEvent.Content)
 			}
 			if client.eventWaitGroup != nil {
 				client.eventWaitGroup.Add(-1)

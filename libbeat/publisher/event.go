@@ -65,7 +65,7 @@ type Batch interface {
 // Event is used by the publisher pipeline and broker to pass additional
 // meta-data to the consumers/outputs.
 type Event struct {
-	Content beat.Event
+	Content *beat.Event
 	Flags   EventFlags
 	Cache   EventCache
 }

@@ -310,7 +310,7 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 	okEvents := data[:0]
 	bulkItems := []interface{}{}
 	for i := range data {
-		event := &data[i].Content
+		event := data[i].Content
 		meta, err := client.createEventBulkMeta(version, event)
 		if err != nil {
 			client.log.Errorf("Failed to encode event meta data: %+v", err)

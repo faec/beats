@@ -262,7 +262,7 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 		data = okEvents[:0]
 		dropped := 0
 		for i, serializedEvent := range serialized {
-			eventKey, err := key.Select(&okEvents[i].Content)
+			eventKey, err := key.Select(okEvents[i].Content)
 			if err != nil {
 				c.log.Errorf("Failed to set redis key: %+v", err)
 				dropped++
@@ -317,7 +317,7 @@ func serializeEvents(
 
 	succeeded := data
 	for _, d := range data {
-		serializedEvent, err := codec.Encode(index, &d.Content)
+		serializedEvent, err := codec.Encode(index, d.Content)
 		if err != nil {
 			log.Errorf("Encoding event failed with error: %+v", err)
 			log.Debugf("Failed event: %v", d.Content)
@@ -335,7 +335,7 @@ failLoop:
 	succeeded = data[:i]
 	rest := data[i+1:]
 	for _, d := range rest {
-		serializedEvent, err := codec.Encode(index, &d.Content)
+		serializedEvent, err := codec.Encode(index, d.Content)
 		if err != nil {
 			log.Errorf("Encoding event failed with error: %+v", err)
 			log.Debugf("Failed event: %v", d.Content)

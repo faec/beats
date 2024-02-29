@@ -149,7 +149,7 @@ func TestClient(t *testing.T) {
 		defer client.Close()
 
 		// consuming all the published events
-		var received []beat.Event
+		var received []*beat.Event
 		done := make(chan struct{})
 		go func() {
 			for {

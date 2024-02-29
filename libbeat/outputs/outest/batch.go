@@ -47,7 +47,8 @@ const (
 func NewBatch(in ...beat.Event) *Batch {
 	events := make([]publisher.Event, len(in))
 	for i, c := range in {
-		events[i] = publisher.Event{Content: c}
+		content := c
+		events[i] = publisher.Event{Content: &content}
 	}
 	return &Batch{events: events}
 }
