@@ -142,7 +142,7 @@ func (st *openState) Close() {
 func (st *openState) publish(req pushRequest) bool {
 	select {
 	case st.events <- req:
-		time.Sleep(time.Microsecond)
+		<-time.After(100 * time.Microsecond)
 		return true
 	case <-st.done:
 		// set events channel to nil so we can't accidentally write to
@@ -155,7 +155,7 @@ func (st *openState) publish(req pushRequest) bool {
 func (st *openState) tryPublish(req pushRequest) bool {
 	select {
 	case st.events <- req:
-		time.Sleep(time.Microsecond)
+		<-time.After(100 * time.Microsecond)
 		return true
 	case <-st.done:
 		st.events = nil
