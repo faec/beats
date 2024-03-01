@@ -19,6 +19,7 @@ package memqueue
 
 import (
 	"sync/atomic"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -141,6 +142,7 @@ func (st *openState) Close() {
 func (st *openState) publish(req pushRequest) bool {
 	select {
 	case st.events <- req:
+		time.Sleep(100 * time.Microsecond)
 		return true
 	case <-st.done:
 		// set events channel to nil so we can't accidentally write to
@@ -153,6 +155,7 @@ func (st *openState) publish(req pushRequest) bool {
 func (st *openState) tryPublish(req pushRequest) bool {
 	select {
 	case st.events <- req:
+		time.Sleep(100 * time.Microsecond)
 		return true
 	case <-st.done:
 		st.events = nil
