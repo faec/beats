@@ -40,7 +40,7 @@ var presetConfigs = map[string]*config.C{
 	presetBalanced: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              1600,
 		"worker":                     1,
-		"queue.mem.events":           3200,
+		"queue.mem.events":           1600,
 		"queue.mem.flush.min_events": 1600,
 		"queue.mem.flush.timeout":    10 * time.Second,
 		"compression_level":          1,
@@ -49,7 +49,7 @@ var presetConfigs = map[string]*config.C{
 	presetThroughput: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              1600,
 		"worker":                     4,
-		"queue.mem.events":           12800,
+		"queue.mem.events":           6400,
 		"queue.mem.flush.min_events": 1600,
 		"queue.mem.flush.timeout":    5 * time.Second,
 		"compression_level":          1,
@@ -58,7 +58,7 @@ var presetConfigs = map[string]*config.C{
 	presetScale: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              1600,
 		"worker":                     1,
-		"queue.mem.events":           3200,
+		"queue.mem.events":           1600,
 		"queue.mem.flush.min_events": 1600,
 		"queue.mem.flush.timeout":    20 * time.Second,
 		"compression_level":          1,
@@ -67,8 +67,8 @@ var presetConfigs = map[string]*config.C{
 	presetLatency: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              50,
 		"worker":                     1,
-		"queue.mem.events":           4100,
-		"queue.mem.flush.min_events": 2050,
+		"queue.mem.events":           50,
+		"queue.mem.flush.min_events": 50,
 		"queue.mem.flush.timeout":    1 * time.Second,
 		"compression_level":          1,
 		"idle_connection_timeout":    60 * time.Second,
