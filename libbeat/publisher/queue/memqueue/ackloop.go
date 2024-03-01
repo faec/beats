@@ -111,11 +111,6 @@ func (l *ackLoop) maybeAdvanceBatchPosition() {
 }
 
 func (l *ackLoop) handleBatchACK(b *batch) {
-	// Clear all event pointers so the memory can be reclaimed immediately.
-	for i := 0; i < b.count; i++ {
-		entry := b.rawEntry(i)
-		entry.event = nil
-	}
 	b.done = true
 }
 

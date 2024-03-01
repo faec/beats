@@ -187,8 +187,7 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 }
 
 func (l *runLoop) handleDelete(count int) {
-	// Advance position and counters. Event data has already been cleared
-	// by ackLoop.
+	// Advance position and counters. Event data has already been cleared.
 	l.bufPos = (l.bufPos + count) % len(l.broker.buf)
 	l.eventCount -= count
 	l.consumedCount -= count
