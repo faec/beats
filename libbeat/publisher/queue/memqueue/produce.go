@@ -18,6 +18,7 @@
 package memqueue
 
 import (
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -49,14 +50,14 @@ type producerID uint64
 
 type produceState struct {
 	cb        ackHandler
-	dropCB    func(interface{})
+	dropCB    func(*publisher.Event)
 	cancelled bool
 	lastACK   producerID
 }
 
 type ackHandler func(count int)
 
-func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCancel bool) queue.Producer {
+func newProducer(b *broker, cb ackHandler, dropCB func(*publisher.Event), dropOnCancel bool) queue.Producer {
 	openState := openState{
 		log:    b.logger,
 		done:   make(chan struct{}),
@@ -72,18 +73,18 @@ func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCance
 	return &forgetfulProducer{broker: b, openState: openState}
 }
 
-func (p *forgetfulProducer) makePushRequest(event interface{}) pushRequest {
+func (p *forgetfulProducer) makePushRequest(event *publisher.Event) pushRequest {
 	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event: event,
 		resp:  resp}
 }
 
-func (p *forgetfulProducer) Publish(event interface{}) (queue.EntryID, bool) {
+func (p *forgetfulProducer) Publish(event *publisher.Event) (queue.EntryID, bool) {
 	return p.openState.publish(p.makePushRequest(event))
 }
 
-func (p *forgetfulProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+func (p *forgetfulProducer) TryPublish(event *publisher.Event) (queue.EntryID, bool) {
 	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
@@ -92,7 +93,7 @@ func (p *forgetfulProducer) Cancel() int {
 	return 0
 }
 
-func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
+func (p *ackProducer) makePushRequest(event *publisher.Event) pushRequest {
 	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event:    event,
@@ -103,7 +104,7 @@ func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
 		resp:       resp}
 }
 
-func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
+func (p *ackProducer) Publish(event *publisher.Event) (queue.EntryID, bool) {
 	id, published := p.openState.publish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
@@ -111,7 +112,7 @@ func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
 	return id, published
 }
 
-func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+func (p *ackProducer) TryPublish(event *publisher.Event) (queue.EntryID, bool) {
 	id, published := p.openState.tryPublish(p.makePushRequest(event))
 	if published {
 		p.producedCount++

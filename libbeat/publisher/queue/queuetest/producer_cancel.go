@@ -53,9 +53,10 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 
 		for ; i < N1; i++ {
 			log.Debugf("send event %v to first producer", i)
-			producer.Publish(MakeEvent(mapstr.M{
+			e := MakeEvent(mapstr.M{
 				"value": i,
-			}))
+			})
+			producer.Publish(&e)
 		}
 
 		// cancel producer
@@ -67,9 +68,10 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 		producer = b.Producer(queue.ProducerConfig{})
 		for ; i < N2; i++ {
 			log.Debugf("send event %v to new producer", i)
-			producer.Publish(MakeEvent(mapstr.M{
+			e := MakeEvent(mapstr.M{
 				"value": i,
-			}))
+			})
+			producer.Publish(&e)
 		}
 
 		// consume all events

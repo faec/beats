@@ -20,6 +20,7 @@ package diskqueue
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -86,8 +87,8 @@ func (batch *diskQueueBatch) Count() int {
 	return len(batch.frames)
 }
 
-func (batch *diskQueueBatch) Entry(i int) interface{} {
-	return batch.frames[i].event
+func (batch *diskQueueBatch) Entry(i int) *publisher.Event {
+	return &batch.frames[i].event
 }
 
 func (batch *diskQueueBatch) FreeEntries() {

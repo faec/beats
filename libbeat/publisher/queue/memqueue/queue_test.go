@@ -31,6 +31,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -98,7 +99,7 @@ func TestProducerDoesNotBlockWhenCancelled(t *testing.T) {
 	p := q.Producer(queue.ProducerConfig{
 		// We do not read from the queue, so the callbacks are never called
 		ACK:          func(count int) {},
-		OnDrop:       func(e interface{}) {},
+		OnDrop:       func(e *publisher.Event) {},
 		DropOnCancel: false,
 	})
 

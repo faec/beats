@@ -162,7 +162,7 @@ func TestClient(t *testing.T) {
 					continue
 				}
 				for i := 0; i < batch.Count(); i++ {
-					e := batch.Entry(i).(publisher.Event)
+					e := batch.Entry(i)
 					received = append(received, e.Content)
 				}
 				batch.Done()

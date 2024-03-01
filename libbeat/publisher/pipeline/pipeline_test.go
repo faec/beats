@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -32,7 +33,7 @@ type testQueue struct {
 }
 
 type testProducer struct {
-	publish func(try bool, event interface{}) (queue.EntryID, bool)
+	publish func(try bool, event *publisher.Event) (queue.EntryID, bool)
 	cancel  func() int
 }
 
@@ -72,14 +73,14 @@ func (q *testQueue) Get(sz int) (queue.Batch, error) {
 	return nil, nil
 }
 
-func (p *testProducer) Publish(event interface{}) (queue.EntryID, bool) {
+func (p *testProducer) Publish(event *publisher.Event) (queue.EntryID, bool) {
 	if p.publish != nil {
 		return p.publish(false, event)
 	}
 	return 0, false
 }
 
-func (p *testProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+func (p *testProducer) TryPublish(event *publisher.Event) (queue.EntryID, bool) {
 	if p.publish != nil {
 		return p.publish(true, event)
 	}
@@ -118,7 +119,7 @@ func makeTestQueue() queue.Queue {
 			var producer *testProducer
 			p := blockingProducer(cfg)
 			producer = &testProducer{
-				publish: func(try bool, event interface{}) (queue.EntryID, bool) {
+				publish: func(try bool, event *publisher.Event) (queue.EntryID, bool) {
 					if try {
 						return p.TryPublish(event)
 					}
@@ -150,7 +151,7 @@ func blockingProducer(_ queue.ProducerConfig) queue.Producer {
 	waiting := atomic.MakeInt(0)
 
 	return &testProducer{
-		publish: func(_ bool, _ interface{}) (queue.EntryID, bool) {
+		publish: func(_ bool, _ *publisher.Event) (queue.EntryID, bool) {
 			waiting.Inc()
 			<-sig
 			return 0, false

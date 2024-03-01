@@ -21,6 +21,7 @@ import (
 	"io"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -63,7 +64,7 @@ type Settings struct {
 }
 
 type queueEntry struct {
-	event interface{}
+	event *publisher.Event
 
 	// The producer that generated this event, or nil if this producer does
 	// not require ack callbacks.

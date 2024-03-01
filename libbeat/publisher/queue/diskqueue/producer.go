@@ -18,6 +18,7 @@
 package diskqueue
 
 import (
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -49,11 +50,11 @@ type producerWriteRequest struct {
 // diskQueueProducer implementation of the queue.Producer interface
 //
 
-func (producer *diskQueueProducer) Publish(event interface{}) (queue.EntryID, bool) {
+func (producer *diskQueueProducer) Publish(event *publisher.Event) (queue.EntryID, bool) {
 	return 0, producer.publish(event, true)
 }
 
-func (producer *diskQueueProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+func (producer *diskQueueProducer) TryPublish(event *publisher.Event) (queue.EntryID, bool) {
 	return 0, producer.publish(event, false)
 }
 

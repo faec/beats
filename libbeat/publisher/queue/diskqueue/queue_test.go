@@ -112,7 +112,8 @@ func TestMetrics(t *testing.T) {
 
 func sendEventsToQueue(count int, prod queue.Producer) {
 	for i := 0; i < count; i++ {
-		prod.Publish(queuetest.MakeEvent(mapstr.M{"count": i}))
+		e := queuetest.MakeEvent(mapstr.M{"count": i})
+		prod.Publish(&e)
 	}
 }
 

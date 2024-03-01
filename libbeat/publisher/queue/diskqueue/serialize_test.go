@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 )
 
 // A test to make sure serialization works correctly on multi-byte characters.
@@ -55,28 +54,12 @@ func TestSerialize(t *testing.T) {
 
 	for name, tc := range tests {
 		encoder := newEventEncoder(tc.format)
-		var event interface{}
-		switch tc.format {
-		case SerializationCBOR:
-			event = publisher.Event{
-				Content: beat.Event{
-					Fields: mapstr.M{
-						"test_field": tc.value,
-					},
+		event := publisher.Event{
+			Content: beat.Event{
+				Fields: mapstr.M{
+					"test_field": tc.value,
 				},
-			}
-		case SerializationProtobuf:
-			event = &messages.Event{
-				Fields: &messages.Struct{
-					Data: map[string]*messages.Value{
-						"test_field": {
-							Kind: &messages.Value_StringValue{
-								StringValue: tc.value,
-							},
-						},
-					},
-				},
-			}
+			},
 		}
 		serialized, err := encoder.encode(event)
 		assert.NoErrorf(t, err, "%s: Couldn't encode event, error: %v", name, err)
@@ -86,24 +69,11 @@ func TestSerialize(t *testing.T) {
 		decoder.serializationFormat = tc.format
 		buf := decoder.Buffer(len(serialized))
 		copy(buf, serialized)
-		decoded, err := decoder.Decode()
+		event, err = decoder.Decode()
 		require.NoErrorf(t, err, "%s: Couldn't decode event", name)
 
-		switch tc.format {
-		case SerializationCBOR:
-			event, ok := decoded.(publisher.Event)
-			require.True(t, ok)
-			decodedValue, err := event.Content.Fields.GetValue("test_field")
-			assert.NoErrorf(t, err, "%s: Couldn't get 'test_field'", name)
-			assert.Equal(t, tc.value, decodedValue)
-		case SerializationProtobuf:
-			event, ok := decoded.(*messages.Event)
-			require.True(t, ok)
-			d := event.GetFields().GetData()
-			test_field, prs := d["test_field"]
-			assert.Truef(t, prs, "'test_field' was not present in decoded event data")
-			decodedValue := test_field.GetStringValue()
-			assert.Equal(t, tc.value, decodedValue)
-		}
+		decodedValue, err := event.Content.Fields.GetValue("test_field")
+		assert.NoErrorf(t, err, "%s: Couldn't get 'test_field'", name)
+		assert.Equal(t, tc.value, decodedValue)
 	}
 }

@@ -17,12 +17,15 @@
 
 package memqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher/queue"
+import (
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+)
 
 // producer -> broker API
 
 type pushRequest struct {
-	event interface{}
+	event *publisher.Event
 
 	// The producer that generated this event, or nil if this producer does
 	// not require ack callbacks.

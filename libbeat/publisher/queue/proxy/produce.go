@@ -18,6 +18,7 @@
 package proxyqueue
 
 import (
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -39,7 +40,7 @@ func newProducer(b *broker, ackHandler func(count int)) queue.Producer {
 		ackHandler: ackHandler}
 }
 
-func (p *producer) makePushRequest(event interface{}, canBlock bool) *pushRequest {
+func (p *producer) makePushRequest(event *publisher.Event, canBlock bool) *pushRequest {
 	req := &pushRequest{
 		event:        event,
 		responseChan: make(chan bool, 1),
@@ -51,14 +52,14 @@ func (p *producer) makePushRequest(event interface{}, canBlock bool) *pushReques
 	return req
 }
 
-func (p *producer) Publish(event interface{}) (queue.EntryID, bool) {
+func (p *producer) Publish(event *publisher.Event) (queue.EntryID, bool) {
 	if p.cancelled {
 		return 0, false
 	}
 	return 0, p.publish(p.makePushRequest(event, true))
 }
 
-func (p *producer) TryPublish(event interface{}) (queue.EntryID, bool) {
+func (p *producer) TryPublish(event *publisher.Event) (queue.EntryID, bool) {
 	if p.cancelled {
 		return 0, false
 	}

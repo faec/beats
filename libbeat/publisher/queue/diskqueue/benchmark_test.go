@@ -116,15 +116,10 @@ func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue
 	return q, p
 }
 
-func publishEvents(p queue.Producer, num int, protobuf bool) {
+func publishEvents(p queue.Producer, num int, _ bool) {
 	for i := 0; i < num; i++ {
-		var e interface{}
-		if protobuf {
-			e = makeMessagesEvent()
-		} else {
-			e = makePublisherEvent()
-		}
-		_, ok := p.Publish(e)
+		e := makePublisherEvent()
+		_, ok := p.Publish(&e)
 		if !ok {
 			panic("didn't publish")
 		}

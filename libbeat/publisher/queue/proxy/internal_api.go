@@ -17,10 +17,12 @@
 
 package proxyqueue
 
+import "github.com/elastic/beats/v7/libbeat/publisher"
+
 // producer -> broker API
 
 type pushRequest struct {
-	event    interface{}
+	event    *publisher.Event
 	producer *producer
 
 	// After receiving a request, the broker will respond on this channel

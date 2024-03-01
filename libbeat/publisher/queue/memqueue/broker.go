@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
@@ -113,7 +114,7 @@ type Settings struct {
 }
 
 type queueEntry struct {
-	event interface{}
+	event *publisher.Event
 	id    queue.EntryID
 
 	producer   *ackProducer
@@ -398,7 +399,7 @@ func (b *batch) rawEntry(i int) *queueEntry {
 }
 
 // Return the event referenced by the i-th element of this batch
-func (b *batch) Entry(i int) interface{} {
+func (b *batch) Entry(i int) *publisher.Event {
 	return b.rawEntry(i).event
 }
 
