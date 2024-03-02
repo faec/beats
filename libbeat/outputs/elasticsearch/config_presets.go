@@ -43,7 +43,7 @@ var presetConfigs = map[string]*config.C{
 		"queue.mem.events":           3200,
 		"queue.mem.flush.min_events": 1600,
 		"queue.mem.flush.timeout":    10 * time.Second,
-		"compression_level":          1,
+		"compression_level":          0,
 		"idle_connection_timeout":    3 * time.Second,
 	}),
 	presetThroughput: config.MustNewConfigFrom(map[string]interface{}{
@@ -52,7 +52,7 @@ var presetConfigs = map[string]*config.C{
 		"queue.mem.events":           12800,
 		"queue.mem.flush.min_events": 1600,
 		"queue.mem.flush.timeout":    5 * time.Second,
-		"compression_level":          1,
+		"compression_level":          0,
 		"idle_connection_timeout":    15 * time.Second,
 	}),
 	presetScale: config.MustNewConfigFrom(map[string]interface{}{
@@ -61,7 +61,7 @@ var presetConfigs = map[string]*config.C{
 		"queue.mem.events":           3200,
 		"queue.mem.flush.min_events": 1600,
 		"queue.mem.flush.timeout":    20 * time.Second,
-		"compression_level":          1,
+		"compression_level":          0,
 		"idle_connection_timeout":    1 * time.Second,
 	}),
 	presetLatency: config.MustNewConfigFrom(map[string]interface{}{
@@ -70,7 +70,7 @@ var presetConfigs = map[string]*config.C{
 		"queue.mem.events":           4100,
 		"queue.mem.flush.min_events": 2050,
 		"queue.mem.flush.timeout":    1 * time.Second,
-		"compression_level":          1,
+		"compression_level":          0,
 		"idle_connection_timeout":    60 * time.Second,
 	}),
 }
