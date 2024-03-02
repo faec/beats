@@ -147,7 +147,7 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK)
 }
 
-func (b *broker) Get(_ int) (queue.Batch, error) {
+func (b *broker) Get(_ int, _ bool) (queue.Batch, error) {
 	// The response channel needs a buffer size of 1 to guarantee that the
 	// broker routine will not block when sending the response.
 	responseChan := make(chan *batch, 1)

@@ -69,7 +69,7 @@ func TestBasicEventFlow(t *testing.T) {
 	success = producer.TryPublish(3)
 	assert.False(t, success, "Current batch should only fit two events")
 
-	batch, err := testQueue.Get(0)
+	batch, err := testQueue.Get(0, false)
 	assert.NoError(t, err, "Should be able to read a batch")
 	assert.Equal(t, 0, listener.ackedCount, "No batches have been acked yet")
 	batch.Done()
@@ -108,7 +108,7 @@ func TestBlockedProducers(t *testing.T) {
 	// First, read all the events. We should be able to do this successfully
 	// even before any have been acknowledged.
 	for consumedEventCount < PRODUCER_COUNT {
-		batch, err := testQueue.Get(0)
+		batch, err := testQueue.Get(0, false)
 		assert.NoError(t, err)
 		consumedEventCount += batch.Count()
 		batches = append(batches, batch)
@@ -143,7 +143,7 @@ func TestOutOfOrderACK(t *testing.T) {
 		assert.True(t, success, "Publish should succeed")
 
 		// Consume a batch, which should contain the events we just published
-		batch, err := testQueue.Get(0)
+		batch, err := testQueue.Get(0, false)
 		assert.NoError(t, err)
 		batch.FreeEntries()
 		assert.Equal(t, 2, batch.Count())

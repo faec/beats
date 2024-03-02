@@ -153,7 +153,7 @@ func TestClient(t *testing.T) {
 		done := make(chan struct{})
 		go func() {
 			for {
-				batch, err := q.Get(2)
+				batch, err := q.Get(2, false)
 				if errors.Is(err, io.EOF) {
 					break
 				}

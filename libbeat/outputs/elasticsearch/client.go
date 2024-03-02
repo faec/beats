@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing"
@@ -187,7 +188,8 @@ func (client *Client) Clone() *Client {
 
 func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error {
 	events := batch.Events()
-	rest, err := client.publishEvents(ctx, events)
+	hints := batch.Hints()
+	rest, err := client.publishEvents(ctx, events, hints)
 
 	switch {
 	case errors.Is(err, errPayloadTooLarge):
@@ -218,7 +220,11 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 // PublishEvents sends all events to elasticsearch. On error a slice with all
 // events not published or confirmed to be processed by elasticsearch will be
 // returned. The input slice backing memory will be reused by return the value.
-func (client *Client) publishEvents(ctx context.Context, data []publisher.Event) ([]publisher.Event, error) {
+func (client *Client) publishEvents(
+	ctx context.Context,
+	data []publisher.Event,
+	hints *queue.QueuePerformanceHints,
+) ([]publisher.Event, error) {
 	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
 	defer span.End()
 
@@ -230,6 +236,11 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 
 	if len(data) == 0 {
 		return nil, nil
+	}
+
+	var encodingDone func()
+	if hints != nil {
+		encodingDone = hints.UnblockCPU
 	}
 
 	// encode events into bulk request buffer, dropping failed elements from
@@ -248,7 +259,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 
 	begin := time.Now()
 	params := map[string]string{"filter_path": "errors,items.*.error,items.*.status"}
-	status, result, sendErr := client.conn.Bulk(ctx, "", "", params, bulkItems)
+	status, result, sendErr := client.conn.Bulk(ctx, "", "", params, bulkItems, encodingDone)
 	timeSinceSend := time.Since(begin)
 
 	if sendErr != nil {

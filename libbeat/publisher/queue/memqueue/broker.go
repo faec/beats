@@ -54,6 +54,8 @@ type broker struct {
 	// wait group for queue workers (runLoop and ackLoop)
 	wg sync.WaitGroup
 
+	hints queue.QueuePerformanceHints
+
 	///////////////////////////
 	// api channels
 
@@ -89,6 +91,8 @@ type broker struct {
 	// safe to free these events and advance the queue by sending the
 	// acknowledged event count to this channel.
 	deleteChan chan int
+
+	unblockCPUChan chan struct{}
 
 	///////////////////////////////
 	// internal goroutine state
@@ -131,6 +135,8 @@ type batch struct {
 	// batch.Done() sends to doneChan, where ackLoop reads it and handles
 	// acknowledgment / cleanup.
 	doneChan chan batchDoneMsg
+
+	usePerfHints bool
 }
 
 type batchList struct {
@@ -213,10 +219,11 @@ func newQueue(
 		buf: make([]queueEntry, settings.Events),
 
 		// broker API channels
-		pushChan:   make(chan pushRequest, inputQueueSize),
-		getChan:    make(chan getRequest),
-		cancelChan: make(chan producerCancelRequest, 5),
-		metricChan: make(chan metricsRequest),
+		pushChan:       make(chan pushRequest, inputQueueSize),
+		getChan:        make(chan getRequest),
+		cancelChan:     make(chan producerCancelRequest, 5),
+		metricChan:     make(chan metricsRequest),
+		unblockCPUChan: make(chan struct{}, 1),
 
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList, 5),
@@ -225,6 +232,8 @@ func newQueue(
 		ackCallback: ackCallback,
 	}
 	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
+
+	b.hints.UnblockCPU = b.unblockCPU
 
 	b.runLoop = newRunLoop(b)
 	b.ackLoop = newACKLoop(b)
@@ -251,13 +260,13 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
 }
 
-func (b *broker) Get(count int) (queue.Batch, error) {
+func (b *broker) Get(count int, perfHints bool) (queue.Batch, error) {
 	responseChan := make(chan *batch, 1)
 	select {
 	case <-b.ctx.Done():
 		return nil, io.EOF
 	case b.getChan <- getRequest{
-		entryCount: count, responseChan: responseChan}:
+		entryCount: count, responseChan: responseChan, perfHints: perfHints}:
 	}
 
 	// if request has been sent, we have to wait for a response
@@ -289,6 +298,13 @@ var batchPool = sync.Pool{
 			doneChan: make(chan batchDoneMsg, 1),
 		}
 	},
+}
+
+func (b *broker) unblockCPU() {
+	select {
+	case b.unblockCPUChan <- struct{}{}:
+	default:
+	}
 }
 
 func newBatch(queue *broker, start, count int) *batch {
@@ -398,6 +414,13 @@ func (b *batch) rawEntry(i int) *queueEntry {
 // Return the event referenced by the i-th element of this batch
 func (b *batch) Entry(i int) interface{} {
 	return b.rawEntry(i).event
+}
+
+func (b *batch) Hints() *queue.QueuePerformanceHints {
+	if b.usePerfHints {
+		return &b.queue.hints
+	}
+	return nil
 }
 
 func (b *batch) FreeEntries() {

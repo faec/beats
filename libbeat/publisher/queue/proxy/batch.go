@@ -17,6 +17,8 @@
 
 package proxyqueue
 
+import "github.com/elastic/beats/v7/libbeat/publisher/queue"
+
 type batch struct {
 	entries []queueEntry
 
@@ -52,6 +54,10 @@ func (b *batch) Count() int {
 
 func (b *batch) Entry(i int) interface{} {
 	return b.entries[i].event
+}
+
+func (b *batch) Hints() *queue.QueuePerformanceHints {
+	return nil
 }
 
 func (b *batch) FreeEntries() {

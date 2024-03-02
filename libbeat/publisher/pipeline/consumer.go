@@ -62,6 +62,7 @@ type consumerTarget struct {
 	ch         chan publisher.Batch
 	timeToLive int
 	batchSize  int
+	perfHints  bool
 }
 
 // retryRequest is used by ttlBatch to add itself back to the eventConsumer
@@ -136,6 +137,7 @@ outerLoop:
 				retryer:    c,
 				batchSize:  target.batchSize,
 				timeToLive: target.timeToLive,
+				perfHints:  target.perfHints,
 			}
 		}
 

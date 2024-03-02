@@ -174,6 +174,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 			ch:         targetChan,
 			batchSize:  outGrp.BatchSize,
 			timeToLive: outGrp.Retry + 1,
+			perfHints:  outGrp.PerfHints,
 		})
 }
 

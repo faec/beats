@@ -20,6 +20,7 @@ package outest
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type Batch struct {
@@ -54,6 +55,10 @@ func NewBatch(in ...beat.Event) *Batch {
 
 func (b *Batch) Events() []publisher.Event {
 	return b.events
+}
+
+func (b *Batch) Hints() *queue.QueuePerformanceHints {
+	return nil
 }
 
 func (b *Batch) ACK() {

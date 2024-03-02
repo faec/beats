@@ -65,9 +65,20 @@ type Queue interface {
 
 	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
 	// there is no bound on the number of returned events.
-	Get(eventCount int) (Batch, error)
+	// If hints is true, and the queue supports it, the resulting batch
+	// will have a QueuePerformanceHints object available through its
+	// Hints() method.
+	Get(eventCount int, hints bool) (Batch, error)
 
 	Metrics() (Metrics, error)
+}
+
+type QueuePerformanceHints struct {
+	// A hint for the queue to begin CPU-heavy tasks if any are pending.
+	// Currently used by the Elasticsearch output to signal that it's
+	// done encoding its bulk ingest request, which is the main CPU
+	// bottleneck.
+	UnblockCPU func()
 }
 
 type QueueFactory func(logger *logp.Logger, ack func(eventCount int), inputQueueSize int) (Queue, error)
@@ -128,6 +139,7 @@ type Producer interface {
 type Batch interface {
 	Count() int
 	Entry(i int) interface{}
+	Hints() *QueuePerformanceHints
 	// Release the internal references to the contained events.
 	// Count() and Entry() cannot be used after this call.
 	// This is only guaranteed to release references when using the

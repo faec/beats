@@ -166,12 +166,14 @@ func (l *ackLoop) collectAcked() batchList {
 // and running producer callbacks from logical deletion of the events, so
 // input callbacks can't block the queue by occupying the runLoop goroutine.
 func (l *ackLoop) processACK(lst batchList, N int) {
+	batchCount := 0
 	ackCallbacks := []func(){}
 	// First we traverse the entries we're about to remove, collecting any callbacks
 	// we need to run.
 	lst.reverse()
 	for !lst.empty() {
 		batch := lst.pop()
+		batchCount++
 
 		// Traverse entries from last to first, so we can acknowledge the most recent
 		// ones first and skip subsequent producer callbacks.
@@ -197,6 +199,11 @@ func (l *ackLoop) processACK(lst batchList, N int) {
 	}
 	// Signal runLoop to delete the events
 	l.broker.deleteChan <- N
+
+	// If we just freed multiple batches, make sure the input is unblocked
+	if batchCount > 1 {
+		l.broker.unblockCPU()
+	}
 
 	// The events have been removed; notify their listeners.
 	l.callbackWorker.callbackChan <- ackCallbacks

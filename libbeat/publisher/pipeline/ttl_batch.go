@@ -49,6 +49,8 @@ type ttlBatch struct {
 	// all split batches descending from the same original batch will
 	// point to the same metadata.
 	split *batchSplitData
+
+	perfHints *queue.QueuePerformanceHints
 }
 
 type batchSplitData struct {
@@ -80,10 +82,11 @@ func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 	original.FreeEntries()
 
 	b := &ttlBatch{
-		done:    original.Done,
-		retryer: retryer,
-		ttl:     ttl,
-		events:  events,
+		done:      original.Done,
+		retryer:   retryer,
+		ttl:       ttl,
+		events:    events,
+		perfHints: original.Hints(),
 	}
 	return b
 }
@@ -98,6 +101,10 @@ func (b *ttlBatch) ACK() {
 
 func (b *ttlBatch) Drop() {
 	b.done()
+}
+
+func (b *ttlBatch) Hints() *queue.QueuePerformanceHints {
+	return b.perfHints
 }
 
 // SplitRetry is called by the output to report that the batch is

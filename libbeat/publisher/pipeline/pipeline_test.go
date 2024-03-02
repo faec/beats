@@ -65,7 +65,7 @@ func (q *testQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return nil
 }
 
-func (q *testQueue) Get(sz int) (queue.Batch, error) {
+func (q *testQueue) Get(sz int, _ bool) (queue.Batch, error) {
 	if q.get != nil {
 		return q.get(sz)
 	}

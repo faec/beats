@@ -69,6 +69,7 @@ func (conn *Connection) Bulk(
 	ctx context.Context,
 	index, docType string,
 	params map[string]string, body []interface{},
+	encodingDone func(),
 ) (int, BulkResult, error) {
 	if len(body) == 0 {
 		return 0, nil, nil
@@ -89,6 +90,9 @@ func (conn *Connection) Bulk(
 		return 0, nil, err
 	}
 	requ.requ = apmHttpV2.RequestWithContext(ctx, requ.requ)
+	if encodingDone != nil {
+		encodingDone()
+	}
 
 	return conn.sendBulkRequest(requ)
 }

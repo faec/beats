@@ -188,7 +188,7 @@ func queueTestWithSettings(t *testing.T, settings Settings, eventsToTest int, te
 	queueMetricsAreValid(t, testQueue, 5, settings.Events, 0, fmt.Sprintf("%s - First send of metrics to queue", testName))
 
 	// Read events, don't yet ack them
-	batch, err := testQueue.Get(eventsToTest)
+	batch, err := testQueue.Get(eventsToTest, false)
 	assert.NilError(t, err, "error in Get")
 	t.Logf("Got batch of %d events", batch.Count())
 

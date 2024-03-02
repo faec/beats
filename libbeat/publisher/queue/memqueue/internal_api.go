@@ -45,6 +45,7 @@ type producerCancelResponse struct {
 type getRequest struct {
 	entryCount   int         // request entryCount events from the broker
 	responseChan chan *batch // channel to send response to
+	perfHints    bool        // whether to use performance hints for this batch
 }
 
 type batchDoneMsg struct{}

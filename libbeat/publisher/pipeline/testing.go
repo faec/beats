@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type mockPublishFn func(publisher.Batch) error
@@ -72,6 +73,10 @@ func (b *mockBatch) Events() []publisher.Event {
 	defer b.mu.Unlock()
 	signalFn(b.onEvents)
 	return b.events
+}
+
+func (b *mockBatch) Hints() *queue.QueuePerformanceHints {
+	return nil
 }
 
 func (b *mockBatch) ACK()             { signalFn(b.onACK) }

@@ -54,6 +54,10 @@ type runLoop struct {
 	// to a pending getRequest even if we can't fill the requested event count.
 	// It is active if and only if pendingGetRequest is non-nil.
 	getTimer *time.Timer
+
+	// When the queue becomes full, we set this flag so that we don't try
+	// to fill it up again immediately on the next ack.
+	blockInput bool
 }
 
 func newRunLoop(broker *broker) *runLoop {
@@ -82,20 +86,13 @@ func (l *runLoop) run() {
 // Perform one iteration of the queue's main run loop. Broken out into a
 // standalone helper function to allow testing of loop invariants.
 func (l *runLoop) runIteration() {
-EAGERDELETE:
-	for {
-		select {
-		case count := <-l.broker.deleteChan:
-			l.handleDelete(count)
-		default:
-			break EAGERDELETE
-		}
-	}
 
 	var pushChan chan pushRequest
 	// Push requests are enabled if the queue isn't yet full.
-	if l.eventCount < len(l.broker.buf) {
+	if !l.blockInput && l.eventCount < len(l.broker.buf) {
 		pushChan = l.broker.pushChan
+	} else {
+		l.blockInput = true
 	}
 
 	var getChan chan getRequest
@@ -109,13 +106,7 @@ EAGERDELETE:
 	// Enable sending to the scheduled ACKs channel if we have
 	// something to send.
 	if !l.consumedBatches.empty() {
-		// be a little greedy
-		select {
-		case l.broker.consumedChan <- l.consumedBatches:
-			l.consumedBatches = batchList{}
-		default:
-			consumedChan = l.broker.consumedChan
-		}
+		consumedChan = l.broker.consumedChan
 	}
 
 	var timeoutChan <-chan time.Time
@@ -153,6 +144,9 @@ EAGERDELETE:
 		l.getTimer.Stop()
 		l.handleGetReply(l.pendingGetRequest)
 		l.pendingGetRequest = nil
+
+	case <-l.broker.unblockCPUChan:
+		l.blockInput = false
 	}
 }
 
@@ -196,6 +190,12 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 }
 
 func (l *runLoop) handleDelete(count int) {
+	// If the queue isn't full, make sure the input is unblocked, since
+	// there's now space for at least two batches
+	if l.eventCount < len(l.broker.buf) || (l.eventCount-count) < count {
+		l.blockInput = false
+	}
+
 	// Clear the internal event pointers so they can be garbage collected
 	for i := 0; i < count; i++ {
 		index := (l.bufPos + i) % len(l.broker.buf)

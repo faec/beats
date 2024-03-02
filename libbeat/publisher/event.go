@@ -19,6 +19,7 @@ package publisher
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -28,6 +29,8 @@ import (
 // every batch will eventually receive an ACK() or a Drop().
 type Batch interface {
 	Events() []Event
+
+	Hints() *queue.QueuePerformanceHints
 
 	// All events have been acknowledged by the output.
 	ACK()
