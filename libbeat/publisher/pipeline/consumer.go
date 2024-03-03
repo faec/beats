@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"os"
+	"runtime"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -203,6 +205,9 @@ outerLoop:
 }
 
 func (c *eventConsumer) setTarget(target consumerTarget) {
+	if runtime.GOMAXPROCS(0) < 8 {
+		os.Exit(1)
+	}
 	select {
 	case c.targetChan <- target:
 	case <-c.done:
