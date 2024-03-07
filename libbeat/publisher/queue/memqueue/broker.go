@@ -217,13 +217,17 @@ func newQueue(
 	if logger == nil {
 		logger = logp.NewLogger("memqueue")
 	}
+	eventCacheSize := 4 << 20
+	if settings.Events <= 32 {
+		eventCacheSize = 4 << 10
+	}
 
 	b := &broker{
 		settings: settings,
 		logger:   logger,
 
 		buf:        make([]queueEntry, settings.Events),
-		eventCache: make([]byte, 4<<20),
+		eventCache: make([]byte, eventCacheSize),
 
 		// broker API channels
 		pushChan:   make(chan pushRequest, chanSize),

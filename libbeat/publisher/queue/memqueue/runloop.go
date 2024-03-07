@@ -240,7 +240,7 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
 		return false
 	}
 	var eventCacheSize int
-	if pubEvent, ok := req.event.(publisher.Event); ok {
+	if pubEvent, ok := req.event.(publisher.Event); ok && pubEvent.CachedEncoding != nil {
 		encodedEvent := pubEvent.CachedEncoding
 		var eventCachePos = -1
 		nextCachePos := (l.broker.eventCacheStart + l.broker.eventCacheOccupied) % len(l.broker.eventCache)
