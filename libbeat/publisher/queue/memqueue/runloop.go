@@ -20,6 +20,7 @@ package memqueue
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -190,7 +191,11 @@ func (l *runLoop) handleDelete(count int) {
 	// Clear the internal event pointers so they can be garbage collected
 	for i := 0; i < count; i++ {
 		index := (l.bufPos + i) % len(l.broker.buf)
-		l.broker.buf[index].event = nil
+		entry := &l.broker.buf[index]
+		entry.event = nil
+		cacheSize := entry.eventCacheSize
+		l.broker.eventCacheStart += cacheSize
+		l.broker.eventCacheOccupied -= cacheSize
 	}
 
 	// Advance position and counters
@@ -234,13 +239,44 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
 		reportCancelledState(req)
 		return false
 	}
+	var eventCacheSize int
+	if encodedEvent, ok := req.event.(beat.EncodedEvent); ok {
+		var eventCachePos = -1
+		nextCachePos := (l.broker.eventCacheStart + l.broker.eventCacheOccupied) % len(l.broker.eventCache)
+		eventSize := encodedEvent.ByteLength()
+		if nextCachePos+eventSize <= len(l.broker.eventCache) {
+			// Simple free size check
+			if l.broker.eventCacheOccupied+eventSize <= len(l.broker.eventCache) {
+				eventCachePos = nextCachePos
+				eventCacheSize = eventSize
+			}
+		} else {
+			// Wrap around the end of the cache
+			wrappedSize := eventSize + len(l.broker.eventCache) - nextCachePos
+			if l.broker.eventCacheOccupied+wrappedSize <= len(l.broker.eventCache) {
+				eventCachePos = 0
+				eventCacheSize = wrappedSize
+			}
+		}
+		if eventCachePos >= 0 {
+			l.broker.eventCacheOccupied += eventCacheSize
+			cacheSlice := l.broker.eventCache[eventCachePos : eventCachePos+eventCacheSize]
+			encodedEvent.ReplaceBuffer(cacheSlice)
+		} else {
+			// Create a new buffer since the event may be using the bytes buffer from
+			// a json encoder
+			newBuf := make([]byte, eventSize)
+			encodedEvent.ReplaceBuffer(newBuf)
+		}
+	}
 
 	index := (l.bufPos + l.eventCount) % len(l.broker.buf)
 	l.broker.buf[index] = queueEntry{
-		event:      req.event,
-		id:         id,
-		producer:   req.producer,
-		producerID: req.producerID,
+		event:          req.event,
+		id:             id,
+		eventCacheSize: eventCacheSize,
+		producer:       req.producer,
+		producerID:     req.producerID,
 	}
 	return true
 }

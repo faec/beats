@@ -47,9 +47,18 @@ type broker struct {
 	ctx       context.Context
 	ctxCancel context.CancelFunc
 
-	// The ring buffer backing the queue. All buffer positions should be taken
-	// modulo the size of this array.
+	// The ring buffer backing the queue entries. All event indices should be
+	// taken modulo the size of this array.
 	buf []queueEntry
+
+	eventCache []byte
+
+	// the index of the first (oldest) byte of event data in the event cache
+	eventCacheStart int
+
+	// The number of bytes currently used in the event cache. The next free
+	// index is (eventCacheStart + eventCacheOccupied) % len(eventCache).
+	eventCacheOccupied int
 
 	// wait group for queue workers (runLoop and ackLoop)
 	wg sync.WaitGroup
@@ -115,6 +124,8 @@ type Settings struct {
 type queueEntry struct {
 	event interface{}
 	id    queue.EntryID
+
+	eventCacheSize int
 
 	producer   *ackProducer
 	producerID producerID // The order of this entry within its producer
@@ -211,7 +222,8 @@ func newQueue(
 		settings: settings,
 		logger:   logger,
 
-		buf: make([]queueEntry, settings.Events),
+		buf:        make([]queueEntry, settings.Events),
+		eventCache: make([]byte, 4<<20),
 
 		// broker API channels
 		pushChan:   make(chan pushRequest, chanSize),

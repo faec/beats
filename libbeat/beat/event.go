@@ -57,8 +57,13 @@ type Event struct {
 	TimeSeries bool        // true if the event contains timeseries data
 }
 
+type EncodedEvent interface {
+	ByteLength() int
+	ReplaceBuffer(buf []byte)
+}
+
 type PreEncoder interface {
-	EncodeEvent(*Event) interface{}
+	EncodeEvent(*Event) EncodedEvent
 }
 
 type PreEncoderFactory func() PreEncoder

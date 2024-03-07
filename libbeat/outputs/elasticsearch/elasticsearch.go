@@ -205,6 +205,15 @@ type encodedEvent struct {
 	encoding []byte
 }
 
+func (e *encodedEvent) ByteLength() int {
+	return len(e.encoding)
+}
+
+func (e *encodedEvent) ReplaceBuffer(buf []byte) {
+	copy(buf, e.encoding)
+	e.encoding = buf
+}
+
 func newPreEncoder(escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
@@ -219,7 +228,7 @@ func newPreEncoder(escapeHTML bool,
 	}
 }
 
-func (pe *eventEncoder) EncodeEvent(e *beat.Event) interface{} {
+func (pe *eventEncoder) EncodeEvent(e *beat.Event) beat.EncodedEvent {
 	opType := events.GetOpType(*e)
 	pipeline, err := getPipeline(e, pe.pipelineSelector)
 	if err != nil {
@@ -237,12 +246,12 @@ func (pe *eventEncoder) EncodeEvent(e *beat.Event) interface{} {
 		return &encodedEvent{err: fmt.Errorf("failed to encode event for output: %w", err)}
 	}
 	bufBytes := pe.buf.Bytes()
-	bytes := make([]byte, len(bufBytes))
-	copy(bytes, bufBytes)
+	//bytes := make([]byte, len(bufBytes))
+	//copy(bytes, bufBytes)
 	return &encodedEvent{
 		id:       id,
 		opType:   opType,
-		encoding: bytes,
+		encoding: bufBytes,
 		pipeline: pipeline,
 		index:    index,
 	}
