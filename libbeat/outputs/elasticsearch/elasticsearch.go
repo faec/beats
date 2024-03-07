@@ -232,10 +232,17 @@ func (pe *eventEncoder) EncodeEvent(e *beat.Event) interface{} {
 
 	id, _ := events.GetMetaStringValue(*e, events.FieldMetaID)
 
-	err = pe.enc.Marshal(e)
+	meta := naiveBulkMeta(opType, index, pipeline, id)
+
+	err = pe.enc.Marshal(meta)
 	if err != nil {
-		return &encodedEvent{err: fmt.Errorf("failed to encode event for output: %w", err)}
+		return &encodedEvent{err: fmt.Errorf("failed to encode indexing metadata for event: %w", err)}
 	}
+	err = pe.enc.AddRaw(e)
+	if err != nil {
+		return &encodedEvent{err: fmt.Errorf("failed to encode event for indexing: %w", err)}
+	}
+
 	bufBytes := pe.buf.Bytes()
 	bytes := make([]byte, len(bufBytes))
 	copy(bytes, bufBytes)
@@ -246,4 +253,17 @@ func (pe *eventEncoder) EncodeEvent(e *beat.Event) interface{} {
 		pipeline: pipeline,
 		index:    index,
 	}
+}
+
+func naiveBulkMeta(opType events.OpType, index, pipeline, id string) interface{} {
+	meta := eslegclient.BulkMeta{
+		Index:    index,
+		Pipeline: pipeline,
+		ID:       id,
+	}
+
+	if opType == events.OpTypeIndex {
+		return eslegclient.BulkIndexAction{Index: meta}
+	}
+	return eslegclient.BulkCreateAction{Create: meta}
 }

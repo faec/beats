@@ -115,14 +115,12 @@ type RawEncoding struct {
 
 func (b *jsonEncoder) addEncodedObject(encoding []byte) error {
 	_, err := b.buf.Write(encoding)
-	if err == nil {
-		b.buf.WriteByte('\n')
-	}
 	return err
 }
 
 func (b *jsonEncoder) AddRaw(obj interface{}) error {
 	var err error
+	var skipNewline bool
 	switch v := obj.(type) {
 	case beat.Event:
 		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
@@ -130,6 +128,7 @@ func (b *jsonEncoder) AddRaw(obj interface{}) error {
 		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case RawEncoding:
 		err = b.addEncodedObject(v.Encoding)
+		skipNewline = true
 	default:
 		err = b.folder.Fold(obj)
 	}
@@ -138,7 +137,9 @@ func (b *jsonEncoder) AddRaw(obj interface{}) error {
 		b.resetState()
 	}
 
-	b.buf.WriteByte('\n')
+	if !skipNewline {
+		b.buf.WriteByte('\n')
+	}
 
 	return err
 }
@@ -208,13 +209,11 @@ var nl = []byte("\n")
 
 func (g *gzipEncoder) addEncodedObject(encoding []byte) error {
 	_, err := g.gzip.Write(encoding)
-	if err == nil {
-		_, err = g.gzip.Write(nl)
-	}
 	return err
 }
 
 func (g *gzipEncoder) AddRaw(obj interface{}) error {
+	var skipNewline bool
 	var err error
 	switch v := obj.(type) {
 	case beat.Event:
@@ -223,15 +222,14 @@ func (g *gzipEncoder) AddRaw(obj interface{}) error {
 		err = g.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case RawEncoding:
 		err = g.addEncodedObject(v.Encoding)
+		skipNewline = true
 	default:
 		err = g.folder.Fold(obj)
 	}
 
-	if err != nil {
-		g.resetState()
+	if err == nil && !skipNewline {
+		_, err = g.gzip.Write(nl)
 	}
-
-	_, err = g.gzip.Write(nl)
 	if err != nil {
 		g.resetState()
 	}

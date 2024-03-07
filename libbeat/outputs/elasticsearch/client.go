@@ -315,16 +315,16 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 			client.log.Error(event.err)
 			continue
 		}
-		meta, err := client.createEventBulkMeta(version, event)
-		if err != nil {
-			client.log.Errorf("Failed to encode event meta data: %+v", err)
-			continue
-		}
 		if event.opType == events.OpTypeDelete {
+			meta, err := client.createEventBulkMeta(version, event)
+			if err != nil {
+				client.log.Errorf("Failed to encode event meta data: %+v", err)
+				continue
+			}
 			// We don't include the event source in a bulk DELETE
 			bulkItems = append(bulkItems, meta)
 		} else {
-			bulkItems = append(bulkItems, meta, eslegclient.RawEncoding{Encoding: event.encoding})
+			bulkItems = append(bulkItems, eslegclient.RawEncoding{Encoding: event.encoding})
 		}
 		okEvents = append(okEvents, data[i])
 	}
