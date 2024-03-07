@@ -260,7 +260,7 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
 		}
 		if eventCachePos >= 0 {
 			l.broker.eventCacheOccupied += eventCacheSize
-			cacheSlice := l.broker.eventCache[eventCachePos : eventCachePos+eventCacheSize]
+			cacheSlice := l.broker.eventCache[eventCachePos : eventCachePos+eventSize]
 			encodedEvent.ReplaceBuffer(cacheSlice)
 		} else {
 			// Create a new buffer since the event may be using the bytes buffer from
