@@ -20,7 +20,7 @@ package memqueue
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -240,7 +240,8 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
 		return false
 	}
 	var eventCacheSize int
-	if encodedEvent, ok := req.event.(beat.EncodedEvent); ok {
+	if pubEvent, ok := req.event.(publisher.Event); ok {
+		encodedEvent := pubEvent.CachedEncoding
 		var eventCachePos = -1
 		nextCachePos := (l.broker.eventCacheStart + l.broker.eventCacheOccupied) % len(l.broker.eventCache)
 		eventSize := encodedEvent.ByteLength()
