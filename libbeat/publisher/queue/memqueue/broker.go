@@ -217,7 +217,7 @@ func newQueue(
 	if logger == nil {
 		logger = logp.NewLogger("memqueue")
 	}
-	eventCacheSize := 4 << 20
+	eventCacheSize := 4 << 23
 	if settings.Events <= 32 {
 		eventCacheSize = 4 << 10
 	}
