@@ -37,7 +37,6 @@ import (
 
 // setup.ilm.* -> supported but the logic is not in place yet
 type unsupportedConfig struct {
-	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
 	EscapeHTML         bool              `config:"escape_html"`
@@ -143,6 +142,11 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		"mapping": map[string]any{
 			"mode": "bodymap",
 		},
+
+		"compression": "gzip",
+		"compression_params": map[string]any{
+			"level": escfg.CompressionLevel,
+		},
 	}
 
 	// Authentication
@@ -186,10 +190,9 @@ func checkUnsupportedConfig(cfg *config.C) error {
 		logp.Warn("parameters is currently not supported")
 	} else if cfg.HasField("proxy_headers") {
 		logp.Warn("proxy_headers is currently not supported")
-	} else if value, _ := cfg.Bool("allow_older_versions", -1); !value {
+	} else if value, err := cfg.Bool("allow_older_versions", -1); err == nil && !value {
 		logp.Warn("allow_older_versions:false is currently not supported")
 	}
-
 	return nil
 }
 
