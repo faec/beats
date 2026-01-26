@@ -712,29 +712,31 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				// Request-level failures: entire HTTP request fails with the specified status code
 				var attemptCount int64
 				mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-					currentAttempt := atomic.AddInt64(&attemptCount, 1)
+					if r.Method == http.MethodPost && r.URL.Path == "/_bulk" {
+						currentAttempt := atomic.AddInt64(&attemptCount, 1)
 
-					// For retryable status codes (429, 503), fail for the first maxRetries attempts, then succeed
-					// For non-retryable status codes (400), always fail
-					var shouldFail bool
-					if tt.bulkErrorCode == "400" {
-						// 400 is never retryable, always fail
-						shouldFail = true
-					} else {
-						// For 429/503, fail for first maxRetries attempts, then succeed
-						shouldFail = currentAttempt <= int64(tt.maxRetries)
-					}
-
-					if shouldFail {
-						switch tt.bulkErrorCode {
-						case "503":
-							http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
-						case "429":
-							http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
-						default:
-							http.Error(w, "Bad Request", http.StatusBadRequest)
+						// For retryable status codes (429, 503), fail for the first maxRetries attempts, then succeed
+						// For non-retryable status codes (400), always fail
+						var shouldFail bool
+						if tt.bulkErrorCode == "400" {
+							// 400 is never retryable, always fail
+							shouldFail = true
+						} else {
+							// For 429/503, fail for first maxRetries attempts, then succeed
+							shouldFail = currentAttempt <= int64(tt.maxRetries)
 						}
-						return
+
+						if shouldFail {
+							switch tt.bulkErrorCode {
+							case "503":
+								http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
+							case "429":
+								http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
+							default:
+								http.Error(w, "Bad Request", http.StatusBadRequest)
+							}
+							return
+						}
 					}
 
 					// Success case - let the deterministic handler handle the response
