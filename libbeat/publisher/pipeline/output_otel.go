@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-asdf broken type otelOutputController struct {
+type otelOutputController struct {
 	beatInfo beat.Info
 	logger   *logp.Logger
 	monitors Monitors
@@ -78,6 +78,11 @@ func newOTelOutputController(
 		if ok {
 			controller.pipelineCount++
 			monitors.Logger.Debugf("newOTelOutputController: connecting to existing output controller for intake queue ID %v (%v pipelines connected)", intakeQueueID, controller.pipelineCount)
+
+			queueMetrics := monitors.Metrics.GetOrCreateRegistry("pipeline").GetOrCreateRegistry("queue")
+			maxEvents := monitoring.NewUint(queueMetrics, "max_events")
+			maxEvents.Set(12345)
+
 			return &otelOutputControllerHandle{
 				otelOutputController: controller,
 				beatInfo:             beatInfo,
