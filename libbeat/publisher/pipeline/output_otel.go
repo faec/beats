@@ -74,6 +74,9 @@ func newOTelOutputController(
 	defer allOutputControllers.Unlock()
 
 	if intakeQueueID != "" {
+		if allOutputControllers.lookup == nil {
+			allOutputControllers.lookup = make(map[string]*otelOutputController)
+		}
 		controller, ok := allOutputControllers.lookup[intakeQueueID]
 		if ok {
 			controller.pipelineCount++
