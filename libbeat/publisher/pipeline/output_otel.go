@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type otelOutputController struct {
+asdf broken type otelOutputController struct {
 	beatInfo beat.Info
 	logger   *logp.Logger
 	monitors Monitors
